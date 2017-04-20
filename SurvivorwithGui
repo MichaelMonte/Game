@@ -1,0 +1,383 @@
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Scanner;
+
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+
+
+public class FinalProject {
+	
+	static ArrayList<Player> players = new ArrayList<>();
+	static Scanner input = new Scanner(System.in);
+	
+	public static void main(String[] args) 
+	{
+		JFrame frame = new GUI();
+		frame.setTitle("Survivor");
+		frame.setSize(720, 525);
+		frame.setLocationRelativeTo(null);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setVisible(true);
+		
+		AddPlayers();
+		verifyNumberOfPlayers();
+		
+		while (true)
+		{
+			for(Player x: players)
+			{
+				if(x.isAlive(x.getHealth()))//TODO Loop until one man stands 
+				{
+					System.out.println(" ");
+					System.out.print("Name: ");         System.out.println(x.getName());
+					System.out.print("Health: ");       System.out.println(x.getHealth());
+					System.out.print("Condition: ");    System.out.println(x.getCondition());///TODO Remove 3
+					System.out.println(" ");
+					System.out.printf("%s, who would you like to attack ===> ", x.getName());
+					String opponent = String.valueOf(input.nextLine());
+					for(Player a: players)
+					{
+						if(a.getName().equalsIgnoreCase(opponent) && !(x.getName().equalsIgnoreCase(opponent)))
+						{
+							System.out.println(" ");
+							//System.out.printf("you would like to attack %s?", a.getName());
+							System.out.println(" ");
+							x.attack(a);
+						}
+						else if(x.getName().equalsIgnoreCase(opponent))
+						{
+							System.out.println(" ");
+							System.out.println("You cant attack yourself");
+							break;
+						}
+						else if (!(a.getName().equalsIgnoreCase(opponent)))
+						{
+							System.out.println(" ");
+							System.out.println("Please enter a person playing");
+							break;
+						}
+					}
+				}
+				else
+				{	
+					System.out.println(" ");
+					System.out.printf("Sorry %s, You are dead \n", x.getName());
+				}
+			}
+		}
+		
+	
+	}
+	public static void AddPlayers()
+	{
+		System.out.print("How many players playing today ===> ");
+		int numberOfPlayers = Integer.valueOf(input.nextLine());//TODO Validate User input (Only numbers)
+		for(int i = 0; numberOfPlayers>i; i++)
+		{
+			System.out.println("please enter player name ===> ");
+			String person = String.valueOf(input.nextLine());
+			players.add(new Player(person));
+		}
+	}
+	public static void verifyNumberOfPlayers()
+	{
+		boolean stop = false;
+		while(stop);	
+		{
+			System.out.println("These are your current players: ");
+			System.out.println("--------------------------------");
+			System.out.println(" ");
+			for(Player n: players)
+			{
+				System.out.println(n.getName());
+			}
+			System.out.println(" ");
+			System.out.println("--------------------------------");
+			System.out.println("Do you want to add more players? (Y/N) ");		
+			String addMore = String.valueOf(input.nextLine());//TODO Validate String 
+			if(addMore.equalsIgnoreCase("y") || addMore.equalsIgnoreCase("yes"))
+			{
+				AddPlayers();	
+				verifyNumberOfPlayers();
+			}
+			else if(addMore.equalsIgnoreCase("n") || addMore.equalsIgnoreCase("no"))
+			{
+				stop = true;
+			}
+			else
+			{
+				System.out.println("Please enter Yes or No");
+			}
+		}	
+	}
+	
+}
+
+class Player
+{
+	String name;
+	String condition;
+	int health = 100;
+	
+	
+	public Player(String name)
+	{
+		this.name = name;
+	}
+	public String getName()
+	{
+		return name;
+	}
+	public void checkTurn()
+	{
+		
+	}
+	public void getTurn()
+	{
+		
+	}
+	public String getCondition()
+	{
+		checkCondition(health);
+		return condition;
+	}
+	public void checkCondition(int health)
+	{
+		if(health>=100)
+		{
+			condition = "excellent";
+		}
+		else if(health<100 && health>=90)
+		{
+			condition = "very good";
+		}
+		else if(health<90 && health>=80)
+		{
+			condition = "good";
+		}
+		else if(health<80 && health>=70)
+		{
+			condition = "average";
+		}
+		else if(health<70 && health>=50)
+		{
+			condition = "poor";
+		}
+		else if(health<50 && health>=30)
+		{
+			condition = "Terrible";//TODO Make sure this is it.
+		}
+		else if(health<30 && health>=1)
+		{
+			condition = "critical";
+		}
+		else if(health<1)
+		{
+			condition = "dead";
+		}
+	
+	}
+	public boolean isAlive(int health)
+	{
+		if(health<1)
+		{
+			return false;
+		}
+		else 
+		{
+			return true;
+		}
+	}
+	public int getHealth() 
+	{
+		return health;
+	}
+	public void setHealth(int health) 
+	{
+		this.health = health;
+	}
+	public void inflictDamage(int points)
+	{
+		/*if (points>=0 && points<=7)
+		 {
+			System.out.println("You missed"); //todo print player n missed player opponent
+		 }
+		if (points>7 && points<=9)
+		 {
+			//regen 8 health for three turns and deal dmg 
+		 }
+		if (points>9 && points<=12)
+		 {
+			//applys poison for 3 turns for 5/per turn ; deal damage
+		 }
+		if (points>12 && points<=13)
+		 {
+			//deal dmg to self for 13
+		 }
+		if (points>13 && points<=15)
+		 {
+			//deal dmg
+		 }
+		if (points>15 && points<=17)
+		 {
+			//1.5 dmg boost
+		 }
+		if (points>17 && points<=18)
+		 {
+			//dodges next attack / deals dmg to target.
+		 }
+		if (points>18 && points<=19)
+		 {
+			//makes enemy stamina cost increase by 15%
+		 }
+		if (points>19 && points<=20)
+		 {
+			//deal dmg; reduce next hit by 20 percent. 
+			//if not used in 2 turns buff gone
+		 }
+		*/
+		if (points>0 && points<=9)
+		 {
+			System.out.println("You missed"); //TODO print player n missed player opponent
+		 }
+		 if (points>9 && points<=20)
+		 {
+			 System.out.print("DIRECT HIT!");  
+			 System.out.println(" you hit for " +  points + " damage");//todo print player n missed player opponent
+			 setHealth(getHealth() - points);	 
+		 }
+	}
+	public int calcDamage()
+	{
+		 int points = (int) ((Math.random() * 20) + 1);
+		 return points;
+	}
+	public void attack(Player name)
+	{
+		name.inflictDamage(calcDamage());
+	}	
+}
+class GUI extends JFrame implements ActionListener 
+{
+	
+	JLabel heading,instructions,playerName,prompt,hitMissMessage;
+	JPanel mainPnl,instuctionsPnl1,namePnl,instructionsPnl2,messagePnl,textfieldPnl,headingPnl;
+	JTextField attack;
+	JButton attackButton;
+	
+	public GUI() {
+	
+		mainPnl = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		mainPnl.setBorder(BorderFactory.createEmptyBorder(30,30,30,30)); 
+		mainPnl.setBackground(Color.RED);
+		
+		headingPnl = new JPanel();
+		headingPnl.setPreferredSize(new Dimension(690, 60));
+		
+		instuctionsPnl1 = new JPanel();
+		instuctionsPnl1.setPreferredSize(new Dimension(690, 120));
+		
+		instructionsPnl2 = new JPanel();
+		instructionsPnl2.setPreferredSize(new Dimension(690, 60));
+		
+		textfieldPnl = new JPanel();
+		textfieldPnl.setPreferredSize(new Dimension(690, 50));
+		
+		namePnl = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		namePnl.setPreferredSize(new Dimension(690, 80));
+		
+		
+		messagePnl = new JPanel();
+		messagePnl.setPreferredSize(new Dimension(690, 50));
+	  	
+	
+	
+		//Making a main panel and then add the small components to the main panel
+		add(mainPnl,BorderLayout.CENTER);
+		mainPnl.add(headingPnl);
+		mainPnl.add(instuctionsPnl1);
+		mainPnl.add(namePnl);
+		mainPnl.add(instructionsPnl2);
+		mainPnl.add(textfieldPnl);
+		mainPnl.add(messagePnl);
+		
+		//ainPnl.add(buttonPnl);
+	
+		
+		heading = new JLabel("Survivor");
+		heading.setFont(new Font("Arial", Font.BOLD, 36));
+		
+		instructions = new JLabel("This is a turn based game "); 
+		instructions.setFont(new Font("Arial", Font.BOLD, 18));
+		
+		playerName = new JLabel();
+		playerName.setFont(new Font("Arial", Font.BOLD, 18));
+		playerName.setHorizontalAlignment(JLabel.LEFT);
+		
+		prompt = new JLabel("who you want to attack?");
+		prompt.setFont(new Font("Arial", Font.BOLD, 18));
+		        
+		hitMissMessage = new JLabel("hit/miss bitch");
+		hitMissMessage.setFont(new Font("Arial", Font.BOLD, 18));
+		              
+		attack = new JTextField(10);
+		attack.setFont(new Font("Arial", Font.BOLD, 18));
+		        
+		attackButton = new JButton("Attack");
+		attackButton.setFont(new Font("Arial", Font.BOLD, 22));
+		        
+		
+		headingPnl.add(heading);
+		instuctionsPnl1.add(instructions);
+		namePnl.add(playerName);
+		instructionsPnl2.add(prompt);
+		textfieldPnl.add(attack);
+		textfieldPnl.add(attackButton);
+		messagePnl.add(hitMissMessage);
+		
+		attackButton.addActionListener(this);
+		
+	}
+	
+	public void actionPerformed(ActionEvent e) {
+		
+		if(e.getSource().equals(attackButton))
+		{
+			hitMissMessage.setText("Hit bitch");
+		}
+		
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+}
