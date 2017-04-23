@@ -1,0 +1,237 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class FinalProject {
+
+	static ArrayList<Player> players = new ArrayList<>();
+	static Scanner input = new Scanner(System.in);
+
+	public static void main(String[] args) 
+	{
+
+		AddPlayers();
+		verifyNumberOfPlayers();
+		while (true)
+		{
+			for(Player x: players)
+			{
+				while(x.isAlive(x.getHealth())) 
+				{
+					/*for(Player z: players)
+					{
+						if(z.isAlive(z.getHealth()))
+						{
+							
+						}
+					}*/
+					
+					System.out.println(" ");
+					System.out.print("Name: ");         System.out.println(x.getName());
+					System.out.print("Health: ");       System.out.println(x.getHealth());
+					System.out.print("Condition: ");    System.out.println(x.getCondition());
+					System.out.println(" ");
+					System.out.printf("%s, who would you like to attack ===> ", x.getName());
+					String opponentName = String.valueOf(input.nextLine());
+
+					Player opponent = searchOpponent(opponentName);
+
+					if(x.getName().equalsIgnoreCase(opponentName))  
+					{
+						System.out.println(" ");
+						System.out.println("You cant attack yourself");
+						break;
+					}
+					else if (opponent != null) // i.e opponent is present in the list
+					{
+						if (opponent.isAlive(opponent.getHealth()))
+						{
+							System.out.println(" ");
+							x.attack(opponent);
+							break;
+						}
+						else                
+						{
+							System.out.println("Please Choose a player that is alive");
+						}
+					}
+					else if (opponent == null ) 
+					{                         
+						System.out.println("Please Choose a player that is present in list");
+					} 
+				} 
+
+				while(x.isAlive(x.getHealth()) == false) // i.e player is dead
+				{	
+					System.out.println(" ");
+					System.out.printf("Sorry %s, You are dead \n", x.getName());
+					break;
+				}
+			} // end of  for loop
+		} // end of main while 
+	} //// end of main
+
+	public static Player searchOpponent(String name)
+	{
+		Player opponent = null;
+		for (Player i : players)
+		{
+			if (i.getName().equalsIgnoreCase(name))
+			{
+				//System.out.println(i.getName() ) ;
+				opponent = i;
+				break;
+			}
+		}
+		return opponent;
+	}
+	public static void AddPlayers()
+	{
+		int numberOfPlayers = 0;
+		System.out.print("How many players playing today ===> ");
+		try
+		{
+			numberOfPlayers = Integer.valueOf(input.nextLine());   
+		}
+		catch(NumberFormatException e)
+		{
+			System.out.println(" ");
+			System.out.println("Please enter a number");
+			AddPlayers(); 
+		}
+
+		for(int i = 0; numberOfPlayers>i; i++)
+		{
+			System.out.println("please enter player name ===> ");
+			String person = String.valueOf(input.nextLine());
+			players.add(new Player(person));
+		}
+	}
+	public static void verifyNumberOfPlayers()
+	{
+		boolean stop = false;
+		while(stop);	
+		{
+			System.out.println("These are your current players: ");
+			System.out.println("--------------------------------");
+			System.out.println(" ");
+			for(Player n: players)
+			{
+				System.out.println(n.getName());
+			}
+			System.out.println(" ");
+			System.out.println("--------------------------------");
+			System.out.println("Do you want to add more players? (Y/N) ");		
+			String addMore = String.valueOf(input.nextLine());
+			if(addMore.equalsIgnoreCase("y") || addMore.equalsIgnoreCase("yes"))
+			{
+				AddPlayers();	
+				verifyNumberOfPlayers();
+			}
+			else if(addMore.equalsIgnoreCase("n") || addMore.equalsIgnoreCase("no"))
+			{
+				stop = true;
+			}
+			else
+			{
+				System.out.println(" ");
+				System.out.println("Please enter Yes or No");
+				System.out.println(" ");
+				verifyNumberOfPlayers();
+			}
+		}	
+	}	
+}
+
+class Player
+{
+	String name;
+	String condition;
+	int health = 100;
+	int turn;
+
+	public Player(String name)
+	{
+		this.name = name;
+	}
+	public String getName()
+	{
+		return name;
+	}
+	public String getCondition()
+	{
+		if(health>=100)
+		{
+			condition = "excellent";
+		}
+		else if(health<100 && health>=90)
+		{
+			condition = "very good";
+		}
+		else if(health<90 && health>=80)
+		{
+			condition = "good";
+		}
+		else if(health<80 && health>=70)
+		{
+			condition = "average";
+		}
+		else if(health<70 && health>=50)
+		{
+			condition = "poor";
+		}
+		else if(health<50 && health>=30)
+		{
+			condition = "terrible";
+		}
+		else if(health<30 && health>=1)
+		{
+			condition = "critical";
+		}
+		else if(health<1)
+		{
+			condition = "dead";
+		}
+		return condition;
+	}
+	public boolean isAlive(int health)
+	{
+		if(health<1)
+		{
+			return false;
+		}
+		else 
+		{
+			return true;
+		}
+	}
+	public int getHealth() 
+	{
+		return health;
+	}
+	public void setHealth(int health) 
+	{
+		this.health = health;
+	}
+	public void inflictDamage(int points)
+	{
+		if (points>9 && points<=20)
+		{
+			System.out.print("DIRECT HIT!");  
+			setHealth(getHealth() - points);	 
+		}
+		if (points>0 && points<=9)
+		{
+			System.out.print("DIRECT MISS!");  
+			//setHealth(getHealth() - points);	 
+		}
+	}
+	public void attack(Player name)
+	{
+		int points = (int) ((Math.random() * 20) + 1);
+		name.inflictDamage(points);
+	}	
+}
+
+
+
+
