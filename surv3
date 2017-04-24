@@ -1,0 +1,292 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+/*******************************************
+ * FinalProject.java
+ * Micheol Monterroso
+ * CIS117.7799.W17
+ * 4/23/17
+ * This Program is designed to simulate a game of survivor 
+ * where players take turns attacking one another 
+ * until one man stands. and is pronounced the winner
+ *******************************************/
+
+public class FinalProject {
+
+	static ArrayList<Player> players = new ArrayList<>();
+	static Scanner input = new Scanner(System.in);
+
+	public static void main(String[] args) 
+	{
+		
+		addPlayers();
+		
+		verifyNumberOfPlayers();
+		
+		GamePlay();
+	} 
+	
+	//********************************************************************
+	
+	// This is the games logic and is used to make sure a player
+	//doesnt attack himself or a dead player. 
+	public static void GamePlay()
+	{
+		while (true)
+		{
+
+			for(Player attackingPlayer: players)
+			{	
+				while(attackingPlayer.isAlive(attackingPlayer.getHealth())) 
+				{	
+
+					System.out.println(" ");
+					System.out.print("Name: ");         System.out.println(attackingPlayer.getName());
+					System.out.print("Health: ");       System.out.println(attackingPlayer.getHealth());
+					System.out.print("Condition: ");    System.out.println(attackingPlayer.getCondition());
+
+					System.out.println(" ");
+					System.out.printf("%s, who would you like to attack ===> ", attackingPlayer.getName());
+					String attackedPlayerName = String.valueOf(input.nextLine());
+					Player attackedPlayer = searchOpponent(attackedPlayerName);
+
+					if(attackingPlayer.getName().equalsIgnoreCase(attackedPlayerName))   //if the player attacking and 'opponent' is the same name
+					{
+						System.out.println(" ");
+						System.out.println("You cant attack yourself");
+						//break allows loop to continue and skipping player who attacked himself.
+					}
+					else if (attackedPlayer != null)                     				 // if searchOpponent() doesnt return null--> user input matches a name in arraylist
+					{
+						if (attackedPlayer.isAlive(attackedPlayer.getHealth()))
+						{
+							System.out.println(" ");
+							attackingPlayer.attack(attackedPlayer);
+							break;
+
+
+							//players.remove(attackedPlayer);
+							//allow for loop to continue to next player
+						}
+						else                
+						{
+							System.out.println(" ");
+							System.out.println("Please choose a player currently still alive");
+						}
+					}
+					else if (attackedPlayer == null ) 
+					{       
+						System.out.println(" ");
+						System.out.println("Please choose a player in the current game");
+					}
+					if (isWinner())
+					{
+						System.out.printf("%s Won the game", attackingPlayer.getName());
+						return;
+					}
+				} 
+				if (isWinner())
+				{
+					System.out.printf("%s Won the game", attackingPlayer.getName());
+					return;
+				}    
+			}
+		}  
+	}
+	//********************************************************************
+	
+	// This methods keeps track of players and how many are alive
+	//once only one is alive returns true
+	public static boolean isWinner()
+	{
+		boolean win = false;
+		int num = 0;
+		for (Player n : players)
+		{
+			if (n.isAlive(n.getHealth()))
+			{
+				num++;
+			}
+		}
+		if (num==1)
+		{
+			win = true;
+		}
+		return win;
+	}
+	//********************************************************************
+	
+	// This methods takes in a user inputed name and matches it with 
+	// a name in the array list- if name is not matched it will remain null
+	//  and loop until user inputs a name in the arraylist
+	public static Player searchOpponent(String name)
+	{
+		Player attackedPlayer = null;
+		for (Player i : players)
+		{
+			if (i.getName().equalsIgnoreCase(name))
+			{
+				attackedPlayer = i;
+				break;
+			}
+		}
+		return attackedPlayer; 	 // if user inputs a name that doesnt match a name in the arraylist -opponent- will return null
+	}
+	
+	//********************************************************************
+	
+	// This methods adds players to the players arraylist after taking input from
+	//the user for how many players they want to add.
+	public static void addPlayers()
+	{
+		int numberOfPlayers = 0;
+		System.out.print("How many players playing today ===> ");
+		try
+		{
+			numberOfPlayers = Integer.valueOf(input.nextLine());   
+		}
+		catch(NumberFormatException e)
+		{
+			System.out.println(" ");
+			System.out.println("*Please enter a number*");
+			addPlayers(); 
+		}
+
+		for(int i = 0; numberOfPlayers>i; i++)
+		{
+			System.out.print("please enter player's name ===> ");
+			String person = String.valueOf(input.nextLine());
+			players.add(new Player(person));
+		}
+	}
+	
+	//********************************************************************
+	
+	// This method makes sure the number of players the user wanted was correct
+	//and allows users to add more players if they want.
+	public static void verifyNumberOfPlayers()
+	{
+		boolean stop = false;
+		while(stop);	
+		{
+			System.out.println(" ");
+			System.out.println("These are your current players: ");
+			System.out.println("--------------------------------");
+			System.out.println(" ");
+			for(Player n: players)
+			{
+				System.out.println(n.getName());
+			}
+			System.out.println(" ");
+			System.out.println("--------------------------------");
+			System.out.println("Do you want to add more players? (Y/N) ");		
+			String addMore = String.valueOf(input.nextLine());
+			if(addMore.equalsIgnoreCase("y") || addMore.equalsIgnoreCase("yes"))
+			{
+				addPlayers();	
+				verifyNumberOfPlayers();
+			}
+			else if(addMore.equalsIgnoreCase("n") || addMore.equalsIgnoreCase("no"))
+			{
+				stop = true;
+			}
+			else
+			{
+				System.out.println(" ");
+				System.out.println("*Please enter Yes or No*");
+				System.out.println(" ");
+				verifyNumberOfPlayers();
+			}
+		}	
+	}	
+}
+
+class Player
+{
+	String name;
+	String condition;
+	int health = 100;
+
+
+	public Player(String name)
+	{
+		this.name = name;
+	}
+	public String getName()
+	{
+		return name;
+	}
+	public String getCondition()
+	{
+		if(health>=100)
+		{
+			condition = "excellent";
+		}
+		else if(health<100 && health>=90)
+		{
+			condition = "very good";
+		}
+		else if(health<90 && health>=80)
+		{
+			condition = "good";
+		}
+		else if(health<80 && health>=70)
+		{
+			condition = "average";
+		}
+		else if(health<70 && health>=50)
+		{
+			condition = "poor";
+		}
+		else if(health<50 && health>=30)
+		{
+			condition = "terrible";
+		}
+		else if(health<30 && health>=1)
+		{
+			condition = "critical";
+		}
+		else if(health<1)
+		{
+			condition = "dead";
+		}
+		return condition;
+	}
+	public boolean isAlive(int health)
+	{
+		if(health<1)
+		{
+			return false;
+		}
+		else 
+		{
+			return true;
+		}
+	}
+	public int getHealth() 
+	{
+		return health;
+	}
+	public void setHealth(int health) 
+	{
+		this.health = health;
+	}
+	public void inflictDamage(int points)
+	{
+		if (points>9 && points<=20)
+		{
+			System.out.print("DIRECT HIT!");
+			System.out.println(" ");
+			setHealth(getHealth() - points);	 
+		}
+	}
+	public void attack(Player name)
+	{
+		int points = (int) ((Math.random() * 20) + 1);
+		name.inflictDamage(points);
+	}	
+}
+
+
+
+
